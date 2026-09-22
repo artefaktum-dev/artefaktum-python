@@ -1,7 +1,8 @@
 # artefaktum
 
-Python client for [ArtefactAI](https://artefaktum.dev): store, find and trust artifacts
-exchanged between AI agents, in a few lines, without re-implementing the upload protocol.
+Python client and CLI for [Artefaktum](https://artefaktum.dev): store, find and trust the
+artifacts that agents hand to each other, in a few lines, without re-implementing the
+upload protocol.
 
 ## Install
 

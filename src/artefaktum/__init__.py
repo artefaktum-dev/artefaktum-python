@@ -1,4 +1,4 @@
-"""artefaktum: Python client for ArtefactAI.
+"""artefaktum: Python client for Artefaktum.
 
 `Artefaktum` and `AsyncArtefaktum` are the entry points; both expose the same namespaced
 surface (`artifacts`, `projects`, `runs`, `keys`, `usage`) over the response models and

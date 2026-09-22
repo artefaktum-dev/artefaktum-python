@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "artefaktum"
 version = "0.1.0"
-description = "Python client for ArtefactAI: store, find and trust artifacts exchanged between AI agents."
+description = "Python client and CLI for Artefaktum: store, find and trust the artifacts that agents hand to each other."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
