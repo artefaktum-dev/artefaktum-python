@@ -49,8 +49,8 @@ select = ["E", "F", "I", "UP", "B", "S", "N"]
 ignore = ["S101"]
 
 [tool.ruff.lint.per-file-ignores]
-# Exception names mirror the server's error codes (`errors.py`) and are the names the
-# tests and design spec import; an "Error" suffix would break that vocabulary.
+# Exception names mirror the server's error codes (`NotFound`, `QuotaExceeded`, ...);
+# an "Error" suffix would break that vocabulary.
 "src/artefaktum/errors.py" = ["N818"]
 
 [tool.mypy]
