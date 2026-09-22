@@ -1,0 +1,41 @@
+# Runs in the public mirror (github.com/artefaktum-dev/artefaktum-python), where this package sits
+# at the repository root. Inert inside the private monorepo, which only reads workflows
+# from its own root and covers this package with .github/workflows/sdk.yml instead.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions: { contents: read }
+
+concurrency: { group: "ci-${{ github.ref }}", cancel-in-progress: true }
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.10" }
+      - run: pip install -e ".[dev,cli]"
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: mypy
+      - run: pytest -q
+
+  # Guards the `cli` extra's `click>=8.1` floor: the job above installs whatever click is
+  # newest, so a regression that only breaks on 8.1.x (e.g. relying on `click.ParamType`
+  # being `Generic`, which it only became in 8.2) would otherwise ship unnoticed.
+  click-floor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.10" }
+      - run: pip install -e ".[dev,cli]"
+      - run: pip install "click==8.1.8"
+      # No mypy/ruff here: `_Duration`'s `# type: ignore[type-arg]` is only needed for
+      # click's typing on 8.2+, and would be flagged as an unused ignore under 8.1's stubs.
+      - run: pytest -q

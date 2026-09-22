@@ -1,0 +1,45 @@
+# Publishes to PyPI from the public mirror on a `v*` tag, via trusted publishing:
+# no API token, an OIDC identity bound to this repository and this workflow file.
+# Configure it once at https://pypi.org/manage/project/artefaktum/settings/publishing/
+# (owner artefaktum-dev, repository artefaktum-python, workflow release.yml, no environment).
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions: { contents: read }
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.10" }
+      - run: pip install -e ".[dev,cli]"
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: mypy
+      - run: pytest -q
+      # A tag that disagrees with the packaged version would publish something nobody can
+      # find by the name they tagged. grep, not tomllib, because this runs on 3.10.
+      - name: tag matches the packaged version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          declared=$(grep -m1 '^version = ' pyproject.toml | cut -d'"' -f2)
+          module=$(grep -m1 '^__version__ = ' src/artefaktum/_version.py | cut -d'"' -f2)
+          echo "tag=$tag pyproject=$declared module=$module"
+          test "$tag" = "$declared" && test "$tag" = "$module"
+      - run: pip install build && python -m build
+      - uses: actions/upload-artifact@v4
+        with: { name: dist, path: dist/ }
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions: { contents: read, id-token: write }
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: dist, path: dist/ }
+      - uses: pypa/gh-action-pypi-publish@release/v1
