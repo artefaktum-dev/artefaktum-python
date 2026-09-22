@@ -41,7 +41,7 @@ Explicit argument, then environment variable, then default.
 ## Uploading
 
 ```python
-client.artifacts.push("data/export.parquet", title="Export")            # a path, streamed
+client.artifacts.push("data/export.parquet", title="Export")  # a path, streamed
 client.artifacts.push(payload, title="Export", filename="export.json")  # bytes
 client.artifacts.create_version(artifact.id, "data/export-v2.parquet")
 ```
@@ -55,8 +55,11 @@ is accepted.
 ```python
 r = client.artifacts.resolve(
     "openweather/vilnius/2026-09-21",
-    filename="weather.json", content_type="application/json", size_bytes=len(body),
-    title="Vilnius weather", max_age=3600,
+    filename="weather.json",
+    content_type="application/json",
+    size_bytes=len(body),
+    title="Vilnius weather",
+    max_age=3600,
 )
 if r.status == "hit":
     use(r.artifact)
@@ -69,7 +72,7 @@ else:
 ## Downloading
 
 ```python
-client.artifacts.pull(artifact.id, "out/")            # into a directory, server-side filename
+client.artifacts.pull(artifact.id, "out/")  # into a directory, server-side filename
 client.artifacts.pull(artifact.id, "out/report.pdf")  # to an exact path
 ```
 
