@@ -362,7 +362,7 @@ def test_logout_when_nothing_saved(tmp_path):
 def test_version_flag():
     result = run_cli(["--version"], _whoami_ok)
     assert result.exit_code == 0
-    assert result.stdout.strip() == "artefaktum, version 0.1.0"
+    assert result.stdout.strip() == "artefaktum, version 0.1.1"
 
 
 def test_json_and_table_together_is_a_usage_error():

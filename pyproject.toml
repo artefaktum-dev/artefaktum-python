@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "artefaktum"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python client and CLI for Artefaktum: store, find and trust the artifacts that agents hand to each other."
 readme = "README.md"
 requires-python = ">=3.10"
