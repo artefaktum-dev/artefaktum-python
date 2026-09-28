@@ -12,6 +12,7 @@ Two notes on where these tests depart from the task brief's snippet:
 from __future__ import annotations
 
 import hashlib
+import inspect
 import json
 from pathlib import Path
 
@@ -19,7 +20,7 @@ import httpx
 import pytest
 
 from artefaktum import Artefaktum, ArtefaktumError, AsyncArtefaktum, IntegrityError, NotFound
-from artefaktum.models import Resolution
+from artefaktum.models import Resolution, Version
 
 from .fixtures import ARTIFACT, DOWNLOAD, KEY, PROJECT, RUN, UPLOAD, VERSION
 
@@ -390,7 +391,6 @@ VERSION_BODY = {
     "filename": "report.pdf",
     "content_type": "application/pdf",
     "size_bytes": len(PDF),
-    "summary": "v2",
     "infer_lineage": True,
 }
 
@@ -415,7 +415,7 @@ def test_create_version_posts_to_the_artifact_uploads_route(tmp_path: Path):
     src = tmp_path / "report.pdf"
     src.write_bytes(PDF)
     api, paths, seen = _version_handlers()
-    a = _client(api).artifacts.create_version("0199-a1", src, summary="v2", wait=False)
+    a = _client(api).artifacts.create_version("0199-a1", src, wait=False)
     assert a.id == "0199-a1"
     assert paths == VERSION_PATHS
     assert seen["create"] == VERSION_BODY
@@ -426,7 +426,7 @@ async def test_async_create_version_posts_to_the_artifact_uploads_route(tmp_path
     src.write_bytes(PDF)
     api, paths, seen = _version_handlers()
     async with _aclient(api) as c:
-        a = await c.artifacts.create_version("0199-a1", src, summary="v2", wait=False)
+        a = await c.artifacts.create_version("0199-a1", src, wait=False)
     assert a.id == "0199-a1"
     assert paths == VERSION_PATHS
     assert seen["create"] == VERSION_BODY
@@ -692,3 +692,17 @@ def test_quota():
 
     q = _client(handler).quota()
     assert q.plan == "pro" and q.storage.limit_bytes == 2 and q.calls.limit == 4
+
+
+def test_summary_is_gone_from_the_public_surface() -> None:
+    for client in (Artefaktum, AsyncArtefaktum):
+        artifacts = client(api_key="k").artifacts
+        for name in ("create_upload", "push", "create_version"):
+            assert "summary" not in inspect.signature(getattr(artifacts, name)).parameters, name
+    assert "summary" not in Version.__dataclass_fields__
+
+
+def test_a_response_that_still_carries_summary_is_parsed() -> None:
+    # An API older than this SDK still returns the key.
+    version = Version.from_json({**VERSION, "summary": "old"})
+    assert version.filename == "report.pdf"

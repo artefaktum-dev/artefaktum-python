@@ -93,11 +93,11 @@ def test_push_sends_create_upload_body_puts_completes_and_polls_to_ready(tmp_pat
     assert len(storage_requests) == 1
 
 
-def test_push_summary_and_run_reach_the_create_upload_body(tmp_path):
-    # `_ops._create_upload` names these fields `summary` and `run_id` in the request
-    # body; the CLI's own flags are `--summary` and `--run` (`run_id` is a Python
-    # keyword-adjacent name that isn't a great flag name, and `client.artifacts.push`
-    # itself takes `run=`, not `run_id=` - see `push_cmd`'s call site).
+def test_push_run_reaches_the_create_upload_body(tmp_path):
+    # `_ops._create_upload` names this field `run_id` in the request body; the CLI's own
+    # flag is `--run` (`run_id` is a Python keyword-adjacent name that isn't a great flag
+    # name, and `client.artifacts.push` itself takes `run=`, not `run_id=` - see
+    # `push_cmd`'s call site).
     src = tmp_path / "hello.txt"
     src.write_bytes(b"hello")
     upload_requests: list[httpx.Request] = []
@@ -120,8 +120,6 @@ def test_push_summary_and_run_reach_the_create_upload_body(tmp_path):
             str(src),
             "--title",
             "t",
-            "--summary",
-            "fixed the churn calc",
             "--run",
             "run-42",
         ],
@@ -132,8 +130,22 @@ def test_push_summary_and_run_reach_the_create_upload_body(tmp_path):
     assert result.exit_code == 0, result.stderr
     assert len(upload_requests) == 1
     body = json.loads(upload_requests[0].content)
-    assert body["summary"] == "fixed the churn calc"
     assert body["run_id"] == "run-42"
+
+
+def test_push_no_longer_accepts_summary(tmp_path):
+    src = tmp_path / "hello.txt"
+    src.write_bytes(b"hello")
+
+    def handler(_: httpx.Request) -> httpx.Response:
+        raise AssertionError("no request should have been made")
+
+    result = run_cli(["push", str(src), "--title", "T", "--summary", "x"], handler, env=_WITH_KEY)
+    # click 8.5's message quotes the option (`No such option '--summary'.`) rather than
+    # the brief's `No such option: --summary`; check the substrings that matter instead
+    # of the exact punctuation, which is click's to change.
+    assert result.exit_code == 2
+    assert "No such option" in result.stderr and "--summary" in result.stderr
 
 
 def test_push_no_wait_does_one_get(tmp_path):

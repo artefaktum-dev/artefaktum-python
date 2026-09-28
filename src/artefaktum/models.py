@@ -75,7 +75,6 @@ class Version:
     size_bytes: int
     etag: str | None
     sha256: str | None
-    summary: str | None
     status: str
     created_at: datetime
 
@@ -89,7 +88,6 @@ class Version:
             size_bytes=int(d["size_bytes"]),
             etag=d.get("etag"),
             sha256=d.get("sha256"),
-            summary=d.get("summary"),
             status=d["status"],
             created_at=_req_dt(d["created_at"]),
         )

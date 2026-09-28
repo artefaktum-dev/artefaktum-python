@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from artefaktum import RequestTooLarge
 from artefaktum.errors import (
     ArtefaktumError,
     Conflict,
@@ -53,3 +54,17 @@ def test_non_json_body_becomes_http_error():
         and err.message == "502 Bad Gateway"
     )
     assert str(err) == "http_error: 502 Bad Gateway"
+
+
+def test_request_too_large_has_its_own_class() -> None:
+    err = from_problem(
+        413,
+        {
+            "code": "request_too_large",
+            "detail": "the request body exceeds the limit of 262144 bytes",
+        },
+        "Payload Too Large",
+    )
+    assert type(err) is RequestTooLarge
+    assert not isinstance(err, QuotaExceeded)
+    assert err.code == "request_too_large" and err.status == 413

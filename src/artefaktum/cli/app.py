@@ -485,7 +485,6 @@ _META_OPTION = click.option(
     "--expires", "expires", type=DURATION, default=None, help="Expire after this long (e.g. 30d)."
 )
 @click.option("--run", "run_id", default=None, help="Attach this upload to a run id.")
-@click.option("--summary", default=None, help="A short summary of what changed.")
 @click.option(
     "--no-wait", is_flag=True, help="Return once the upload is accepted, without waiting."
 )
@@ -507,7 +506,6 @@ def push_cmd(
     meta: dict[str, str],
     expires: timedelta | None,
     run_id: str | None,
-    summary: str | None,
     no_wait: bool,
     timeout: float,
 ) -> None:
@@ -522,7 +520,6 @@ def push_cmd(
             metadata=meta or None,
             external_key=external_key,
             expires_at=expires_at,
-            summary=summary,
             run=run_id,
             wait=not no_wait,
             timeout=timeout,

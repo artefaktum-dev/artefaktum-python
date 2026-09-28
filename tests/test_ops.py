@@ -37,7 +37,6 @@ def test_create_upload_builds_body_and_parses_ticket():
         metadata={"k": 1},
         external_key="ek",
         expires_at=datetime(2026, 10, 1, tzinfo=timezone.utc),
-        summary=None,
         run_id=None,
         infer_lineage=True,
     )
@@ -54,7 +53,7 @@ def test_create_upload_builds_body_and_parses_ticket():
         "external_key": "ek",
         "expires_at": "2026-10-01T00:00:00+00:00",
         "infer_lineage": True,
-    }  # None values (summary, run_id) omitted
+    }  # None values (run_id) omitted
     assert ops.create_upload.parse(UPLOAD).upload.method == "PUT"
     assert ops.create_upload.idempotent is False
 
@@ -265,7 +264,6 @@ def test_create_version_upload_posts_to_artifact_uploads():
         filename="b.json",
         content_type="application/json",
         size_bytes=4,
-        summary=None,
         run_id=None,
         infer_lineage=True,
     )

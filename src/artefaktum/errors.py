@@ -40,6 +40,13 @@ class Forbidden(ArtefaktumError): ...
 class QuotaExceeded(ArtefaktumError): ...
 
 
+class RequestTooLarge(ArtefaktumError):
+    """The request body is over the API's size limit.
+
+    File bytes never count: they go straight to storage.
+    """
+
+
 class Conflict(ArtefaktumError): ...
 
 
@@ -96,6 +103,7 @@ _BY_CODE: dict[str, type[ArtefaktumError]] = {
     "unauthorized": Unauthorized,
     "insufficient_scope": Forbidden,
     "quota_exceeded": QuotaExceeded,
+    "request_too_large": RequestTooLarge,
     "artifact_not_ready": Conflict,
     "external_key_conflict": Conflict,
     "idempotency_conflict": Conflict,

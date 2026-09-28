@@ -122,7 +122,6 @@ def _create_upload(
     metadata: dict[str, Any] | None = None,
     external_key: str | None = None,
     expires_at: datetime | None = None,
-    summary: str | None = None,
     run_id: str | None = None,
     infer_lineage: bool = True,
 ) -> Request:
@@ -143,7 +142,6 @@ def _create_upload(
                 "metadata": dict(metadata or {}),
                 "external_key": external_key,
                 "expires_at": _iso(expires_at),
-                "summary": summary,
                 "run_id": run_id,
                 "infer_lineage": infer_lineage,
             }
@@ -386,7 +384,6 @@ def _create_version_upload(
     filename: str,
     content_type: str,
     size_bytes: int,
-    summary: str | None = None,
     run_id: str | None = None,
     infer_lineage: bool = True,
 ) -> Request:
@@ -401,7 +398,6 @@ def _create_version_upload(
                 "filename": filename,
                 "content_type": content_type,
                 "size_bytes": size_bytes,
-                "summary": summary,
                 "run_id": run_id,
                 "infer_lineage": infer_lineage,
             }
